@@ -4,11 +4,11 @@ import java.math.*;
 
 class Player {
 
-    public static void main(String args[]) {
+    public static void main(String args[]) throws NullPointerException {
         Scanner in = new Scanner(System.in);
         
         ShipHandler handler = new ShipHandler();
-
+        String command = "";
         // game loop
         while (true) {
             int myShipCount = in.nextInt(); // the number of remaining ships
@@ -34,13 +34,29 @@ class Player {
                 }
             }
             
+            
+            
             for(Ship s : handler.getShips()) { //for every ship
                 if(s.getFoe() == 1) { //if the ship is controlled by us
-                    System.out.println(s.performAction(handler.getBarrels())); //do something
+                
+                    try{
+                        command += s.move(handler.getBarrels()); //do something
+                        if(command.length()>0){
+                            System.out.println(command);
+                        }
+                        else{
+                            System.out.println("WAIT");
+                        }
+                    }
+                    catch(NullPointerException e){
+                        System.out.println("WAIT");
+                    }
                 }
+                
             }
             handler.clearBarrels();
             handler.clearShips();
+            command = "";
         }
     }
 }
@@ -109,9 +125,7 @@ class Ship {
         id = 0;
     }
     
-    public String performAction(ArrayList<Barrel> barrels){
-        String r = "";
-        
+    public String move(ArrayList<Barrel> barrels){ //to closest carrel 
         Barrel closest = null;
         boolean first = true;
         for(Barrel ba : barrels){
@@ -129,6 +143,10 @@ class Ship {
         }
         
         return "MOVE " + closest.getX() + " " + closest.getY();
+    }
+    
+    public String cannon(ArrayList<Ship> s){ //will fire if enemy is within certain distance
+        //find closest
     }
     
     public double distanceFrom(int xFrom, int yFrom, int xTo, int yTo){
