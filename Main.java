@@ -168,6 +168,7 @@ class Ship {
         return "MOVE " + closest.getX() + " " + closest.getY();
     }
     
+<<<<<<< HEAD
     public String fire(ArrayList<Ship> ships){ //to closest carrel 
         Ship closest = null;
         boolean first = true;
@@ -195,6 +196,12 @@ class Ship {
         }
     } 
        
+=======
+    //public String cannon(ArrayList<Ship> s){ //will fire if enemy is within certain distance
+        //find closest
+    //}
+    
+>>>>>>> 8e314a799315fdea673583078e399cbdeac78cd1
     public double distanceFrom(int xFrom, int yFrom, int xTo, int yTo){
         int a = xTo - xFrom;
         int b = yTo - yFrom;
