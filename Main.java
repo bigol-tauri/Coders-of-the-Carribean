@@ -66,9 +66,12 @@ class ShipHandler {
     
     private ArrayList<Barrel> barrels;
     
+    private ArrayList<Mine> mines;
+    
     public ShipHandler(){
         ships = new ArrayList<Ship>();
         barrels = new ArrayList<Barrel>();
+        mines = new ArrayList<Mine>();
     }
     
     public void addShip(Ship s){
@@ -79,6 +82,10 @@ class ShipHandler {
         barrels.add(b);
     }
     
+    public void addMine(Mine m) {
+        mines.add(m);
+    }
+    
     public void clearBarrels(){
         barrels.clear();
     }
@@ -87,12 +94,20 @@ class ShipHandler {
         ships.clear();
     }
     
+    public void clearMines(){
+        mines.clear();
+    }
+    
     public ArrayList<Ship> getShips(){
         return ships;
     }
     
     public ArrayList<Barrel> getBarrels(){
         return barrels;
+    }
+    
+    public ArrayList<Mine> getMines() {
+        return mines;
     }
 }
 
@@ -145,9 +160,9 @@ class Ship {
         return "MOVE " + closest.getX() + " " + closest.getY();
     }
     
-    public String cannon(ArrayList<Ship> s){ //will fire if enemy is within certain distance
+    //public String cannon(ArrayList<Ship> s){ //will fire if enemy is within certain distance
         //find closest
-    }
+    //}
     
     public double distanceFrom(int xFrom, int yFrom, int xTo, int yTo){
         int a = xTo - xFrom;
@@ -193,4 +208,17 @@ class Barrel {
     public int getRum(){ return rum; }
     public int getID(){ return id; }
 
+}
+
+class Mine {
+    private int x;
+    private int y;
+    
+    public Mine(int _x, int _y) {
+        x = _x;
+        y = _y;
+    }
+    
+    public int getX(){ return x; }
+    public int getY(){ return y; }
 }
