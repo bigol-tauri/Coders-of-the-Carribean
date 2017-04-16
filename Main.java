@@ -9,6 +9,7 @@ class Player {
         
         ShipHandler handler = new ShipHandler();
         String command = "";
+        int frame = 0; //counts game frames. used for deciding when to fire, eg. every 2 frames
         // game loop
         while (true) {
             int myShipCount = in.nextInt(); // the number of remaining ships
@@ -38,25 +39,32 @@ class Player {
             
             for(Ship s : handler.getShips()) { //for every ship
                 if(s.getFoe() == 1) { //if the ship is controlled by us
-                
+                                        
                     try{
-                        command += s.move(handler.getBarrels()); //do something
-                        if(command.length()>0){
-                            System.out.println(command);
-                        }
-                        else{
-                            System.out.println("WAIT");
-                        }
+                        command = s.move(handler.getBarrels()); //do something
+                        if(!(command.length()>0)){
+                            command = "WAIT";
+                        }  
                     }
                     catch(NullPointerException e){
                         System.out.println("WAIT");
                     }
+                    
+                    String fireCommand = s.fire(handler.getShips());
+                    if(frame%2==0 && fireCommand.length()>1){ //if ship within 5 blocks and even frame
+                        command = fireCommand;
+                    }
+                    
+                    System.out.println(command);
                 }
                 
             }
             handler.clearBarrels();
             handler.clearShips();
+            handler.clearMines();
             command = "";
+            
+            frame++;
         }
     }
 }
@@ -66,9 +74,12 @@ class ShipHandler {
     
     private ArrayList<Barrel> barrels;
     
+    private ArrayList<Mine> mines;
+    
     public ShipHandler(){
         ships = new ArrayList<Ship>();
         barrels = new ArrayList<Barrel>();
+        mines = new ArrayList<Mine>();
     }
     
     public void addShip(Ship s){
@@ -79,6 +90,10 @@ class ShipHandler {
         barrels.add(b);
     }
     
+    public void addMine(Mine m) {
+        mines.add(m);
+    }
+    
     public void clearBarrels(){
         barrels.clear();
     }
@@ -87,12 +102,20 @@ class ShipHandler {
         ships.clear();
     }
     
+    public void clearMines(){
+        mines.clear();
+    }
+    
     public ArrayList<Ship> getShips(){
         return ships;
     }
     
     public ArrayList<Barrel> getBarrels(){
         return barrels;
+    }
+    
+    public ArrayList<Mine> getMines() {
+        return mines;
     }
 }
 
@@ -145,10 +168,33 @@ class Ship {
         return "MOVE " + closest.getX() + " " + closest.getY();
     }
     
-    public String cannon(ArrayList<Ship> s){ //will fire if enemy is within certain distance
-        //find closest
-    }
-    
+    public String fire(ArrayList<Ship> ships){ //to closest carrel 
+        Ship closest = null;
+        boolean first = true;
+        for(Ship s : ships){
+            if(s.getFoe()==0){ //enemy ship
+                if(first){
+                    closest = s;
+                    first = false;
+                }
+                else{
+                    if(distanceFrom(this.getX(), this.getY(), s.getX(), s.getY()) <
+                       distanceFrom(this.getX(), this.getY(), closest.getX(), closest.getY())
+                    ){
+                        closest = s;
+                    }
+                }
+            }
+        }
+        //if ship is within 5 units
+        if(distanceFrom(this.getX(), this.getY(), closest.getX(), closest.getY()) <= 10){
+            return "FIRE 10 10";//... calculate best point to aim for based on enemy ship movement
+        }
+        else{
+            return "";
+        }
+    } 
+       
     public double distanceFrom(int xFrom, int yFrom, int xTo, int yTo){
         int a = xTo - xFrom;
         int b = yTo - yFrom;
@@ -193,4 +239,17 @@ class Barrel {
     public int getRum(){ return rum; }
     public int getID(){ return id; }
 
+}
+
+class Mine {
+    private int x;
+    private int y;
+    
+    public Mine(int _x, int _y) {
+        x = _x;
+        y = _y;
+    }
+    
+    public int getX(){ return x; }
+    public int getY(){ return y; }
 }
