@@ -217,6 +217,120 @@ class Ship {
     	return Math.max(m, Math.abs(z1 - z2));
     }
     
+    public ArrayList<Coordinate> trajectory(){
+        ArrayList<Coordinate> attackPoints = new ArrayList<Coordinate>();
+        
+        if(this.getRot()==0){
+            for(int i = this.getX()+1; i<23; i++){
+                attackPoints.add(new Coordinate(i, this.getY()));
+            }
+        }
+        else if(this.getRot()==3){
+            for(int i = this.getX()-1; i>=0; i--){
+                attackPoints.add(new Coordinate(i, this.getY()));
+            }
+        }
+        else if(this.getRot()==1){
+            for(Coordinate i = this.getCoord(); i.getY()>=0 && i.getY()<21 && i.getX()<23 && i.getX()>=0; i = coordinateMovedByRotation(i, 1)){
+                attackPoints.add(i);
+            }
+        }
+        else if(this.getRot()==2){
+            for(Coordinate i = this.getCoord(); i.getY()>=0 && i.getY()<21 && i.getX()<23 && i.getX()>=0; i = coordinateMovedByRotation(i, 2)){
+                attackPoints.add(i);
+            }
+        }
+        else if(this.getRot()==4){
+            for(Coordinate i = this.getCoord(); i.getY()>=0 && i.getY()<21 && i.getX()<23 && i.getX()>=0; i = coordinateMovedByRotation(i, 4)){
+                attackPoints.add(i);
+            }
+        }
+        else if(this.getRot()==5){
+            for(Coordinate i = this.getCoord(); i.getY()>=0 && i.getY()<21 && i.getX()<23 && i.getX()>=0; i = coordinateMovedByRotation(i, 5)){
+                attackPoints.add(i);
+            }
+        }
+        
+        return attackPoints;
+    }
+    
+    public static Coordinate coordinateMovedByRotation(Coordinate c, int rot){
+        if(rot==1){
+            //odd-even coord rot=1
+            if(c.getX()%2==1 && c.getY()%2==0){
+                return new Coordinate(c.getX(), c.getY()-1);
+            }
+            //odd-odd coord rot=1
+            if(c.getX()%2==1 && c.getY()%2==1){
+                return new Coordinate(c.getX()+1, c.getY()-1);
+            }
+            //even-even coord rot=1
+            if(c.getX()%2==0 && c.getY()%2==0){
+                return new Coordinate(c.getX(), c.getY()-1);
+            }
+            //even-odd coord rot=1
+            if(c.getX()%2==0 && c.getY()%2==0){
+                return new Coordinate(c.getX()+1, c.getY()-1);
+            }
+        }
+        else if(rot==2){
+            //odd-even coord rot=2
+            if(c.getX()%2==1 && c.getY()%2==0){
+                return new Coordinate(c.getX()-1, c.getY()-1);
+            }
+            //odd-odd coord rot=2
+            if(c.getX()%2==1 && c.getY()%2==1){
+                return new Coordinate(c.getX(), c.getY()-1);
+            }
+            //even-even coord rot=2
+            if(c.getX()%2==0 && c.getY()%2==0){
+                return new Coordinate(c.getX()-1, c.getY()-1);
+            }
+            //even-odd coord rot=2
+            if(c.getX()%2==0 && c.getY()%2==0){
+                return new Coordinate(c.getX(), c.getY()-1);
+            }
+        }
+        else if(rot==4){
+            //odd-even coord rot=4
+            if(c.getX()%2==1 && c.getY()%2==0){
+                return new Coordinate(c.getX()-1, c.getY()+1);
+            }
+            //odd-odd coord rot=4
+            if(c.getX()%2==1 && c.getY()%2==1){
+                return new Coordinate(c.getX(), c.getY()+1);
+            }
+            //even-even coord rot=4
+            if(c.getX()%2==0 && c.getY()%2==0){
+                return new Coordinate(c.getX()-1, c.getY()+1);
+            }
+            //even-odd coord rot=4
+            if(c.getX()%2==0 && c.getY()%2==0){
+                return new Coordinate(c.getX(), c.getY()+1);
+            }
+        }
+        else if(rot==5){
+            //odd-even coord rot=5
+            if(c.getX()%2==1 && c.getY()%2==0){
+                return new Coordinate(c.getX(), c.getY()+1);
+            }
+            //odd-odd coord rot=5
+            if(c.getX()%2==1 && c.getY()%2==1){
+                return new Coordinate(c.getX()+1, c.getY()+1);
+            }
+            //even-even coord rot=5
+            if(c.getX()%2==0 && c.getY()%2==0){
+                return new Coordinate(c.getX(), c.getY()+1);
+            }
+            //even-odd coord rot=5
+            if(c.getX()%2==0 && c.getY()%2==0){
+                return new Coordinate(c.getX()+1, c.getY()+1);
+            }
+        }
+        return null;
+    }
+    
+    public Coordinate getCoord(){ return coord; }
     public int getX(){ return coord.getX(); }
     public int getY(){ return coord.getY(); }
     public int getRot(){ return rot; }
