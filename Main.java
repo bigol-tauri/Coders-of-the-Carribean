@@ -65,7 +65,7 @@ class Player {
             command = "";
             
             frame++;
-        }
+        }   
     }
 }
 
@@ -157,8 +157,8 @@ class Ship {
                 first = false;
             }
             else{
-                if(distanceFrom(this.getX(), this.getY(), ba.getX(), ba.getY()) <
-                   distanceFrom(this.getX(), this.getY(), closest.getX(), closest.getY())
+                if(hexDistance(this.getX(), this.getY(), ba.getX(), ba.getY()) <
+                   hexDistance(this.getX(), this.getY(), closest.getX(), closest.getY())
                 ){
                     closest = ba;
                 }
@@ -168,7 +168,6 @@ class Ship {
         return "MOVE " + closest.getX() + " " + closest.getY();
     }
     
-<<<<<<< HEAD
     public String fire(ArrayList<Ship> ships){ //to closest carrel 
         Ship closest = null;
         boolean first = true;
@@ -179,8 +178,8 @@ class Ship {
                     first = false;
                 }
                 else{
-                    if(distanceFrom(this.getX(), this.getY(), s.getX(), s.getY()) <
-                       distanceFrom(this.getX(), this.getY(), closest.getX(), closest.getY())
+                    if(hexDistance(this.getX(), this.getY(), s.getX(), s.getY()) <
+                       hexDistance(this.getX(), this.getY(), closest.getX(), closest.getY())
                     ){
                         closest = s;
                     }
@@ -188,26 +187,37 @@ class Ship {
             }
         }
         //if ship is within 5 units
-        if(distanceFrom(this.getX(), this.getY(), closest.getX(), closest.getY()) <= 10){
-            return "FIRE 10 10";//... calculate best point to aim for based on enemy ship movement
+        if(hexDistance(this.getX(), this.getY(), closest.getX(), closest.getY()) <= 10){
+            
+            
+            return "FIRE 10 10";
         }
         else{
             return "";
         }
     } 
-       
-=======
-    //public String cannon(ArrayList<Ship> s){ //will fire if enemy is within certain distance
-        //find closest
+    
+    //actual distance betwen two points
+    //public double distanceFrom(int xFrom, int yFrom, int xTo, int yTo){
+    //    int a = xTo - xFrom;
+    //    int b = yTo - yFrom;
+    //    double c = Math.sqrt(Math.pow(a,2) + Math.pow(b,2));
+    //    
+    //    return c;
     //}
     
->>>>>>> 8e314a799315fdea673583078e399cbdeac78cd1
-    public double distanceFrom(int xFrom, int yFrom, int xTo, int yTo){
-        int a = xTo - xFrom;
-        int b = yTo - yFrom;
-        double c = Math.sqrt(Math.pow(a,2) + Math.pow(b,2));
+    //distance (moves required) between two points on the hex grid
+    public static int hexDistance(int xf, int yf, int xt, int yt){
+        int x1 = xf - (yf - (xf&1)) / 2;
+        int z1 = yf;
+        int y1 = -x1 - z1;
         
-        return c;
+        int x2 = xt - (yt - (xt&1)) / 2;
+        int z2 = yt;
+        int y2 = -x2 - z2;
+        
+        int m = Math.max(Math.abs(x1 - x2), Math.abs(y1 - y2));
+    	return Math.max(m, Math.abs(z1 - z2));
     }
     
     public int getX(){ return x; }
@@ -260,3 +270,6 @@ class Mine {
     public int getX(){ return x; }
     public int getY(){ return y; }
 }
+    
+
+        
