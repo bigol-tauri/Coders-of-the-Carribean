@@ -120,8 +120,7 @@ class ShipHandler {
 }
 
 class Ship {
-    private int x;
-    private int y;
+    private Coordinate coord;
     private int rot;
     private int speed;
     private int rum;
@@ -129,8 +128,7 @@ class Ship {
     private int id;
     
     public Ship(int _x, int _y, int ro, int s, int r, int f, int i){
-        x = _x;
-        y = _y;
+        coord = new Coordinate(_x,_y);
         rot = ro;
         speed = s;
         rum = r;
@@ -139,8 +137,7 @@ class Ship {
     }
     
     public Ship(){
-        x = 0;
-        y = 0;
+        coord = new Coordinate(0,0);
         rot = 0;
         speed = 0;
         rum = 0;
@@ -220,56 +217,55 @@ class Ship {
     	return Math.max(m, Math.abs(z1 - z2));
     }
     
-    public int getX(){ return x; }
-    public int getY(){ return y; }
+    public int getX(){ return coord.getX(); }
+    public int getY(){ return coord.getY(); }
     public int getRot(){ return rot; }
     public int getSpeed(){ return speed; }
     public int getRum(){ return rum; }
     public int getFoe(){ return foe; }
     public int getID(){ return id; }
     
-    public void setX(int _x){ x = _x;}
-    public void setY(int _y){ y = _y; }
-    public void setRot(int r){ rot = r; }
-    public void setSpeed(int s){ speed = s; }
-    public void setRum(int r){ rum = r; }
-    public void setFoe(int f){ foe = f; }
-    public void setId(int i){ id = i;}
-    
 }
 
 class Barrel {
-    private int x;
-    private int y;
+    private Coordinate coord;
     private int rum;
     private int id;
 
     public Barrel(int _x, int _y, int _r, int _i){
-        x = _x;
-        y = _y;
+        coord = new Coordinate(_x,_y);
         rum = _r;
         id = _i;
     }
     
-    public int getX(){ return x; }
-    public int getY(){ return y; }
+    public int getX(){ return coord.getX(); }
+    public int getY(){ return coord.getY(); }
     public int getRum(){ return rum; }
     public int getID(){ return id; }
 
 }
 
 class Mine {
+    private Coordinate coord;
+    
+    public Mine(int _x, int _y) {
+        coord = new Coordinate(_x,_y);
+    }
+    
+    public int getX(){ return coord.getX(); }
+    public int getY(){ return coord.getY(); }
+}
+    
+class Coordinate {
     private int x;
     private int y;
     
-    public Mine(int _x, int _y) {
-        x = _x;
-        y = _y;
+    public Coordinate(int x1, int y1){
+        x = x1;
+        y = y1;
     }
     
     public int getX(){ return x; }
-    public int getY(){ return y; }
+    public int getY(){ return y; }   
 }
-    
-
         
