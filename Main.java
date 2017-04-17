@@ -178,7 +178,7 @@ class Ship {
         return "MOVE " + closest.getX() + " " + closest.getY();
     }
     
-    public String fire(ArrayList<Ship> ships) throws NullPointerException{ //to closest carrel 
+    public String fire(ArrayList<Ship> ships) throws NullPointerException{
         Ship closest = null;
         boolean first = true;
         for(Ship s : ships){
@@ -208,16 +208,15 @@ class Ship {
                 int enemyDistanceInTurns = HexDistance.distance(closest.getCoord(), target)/2;
                 
                 //how many turns for cannonball to go from front of ship to target
-                int cannonDistanceInTurns = 1 + Math.round(HexDistance.distance(frontOfShip, target)/3);
+                double dist = HexDistance.distance(frontOfShip, target)/3.0;
+                int cannonDistanceInTurns = 1 + (int)(Math.round(dist));
 
                 
                 if(enemyDistanceInTurns == cannonDistanceInTurns-1){
+                    target = coordinateMovedByRotation( target, closest.getRot());
                     return "FIRE "+target.getX()+" " + target.getY();
-                }
-                                                                        
-                                                                      
+                }                                                      
             }
-            
         }
         else{
             return "";
