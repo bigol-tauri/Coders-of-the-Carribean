@@ -51,11 +51,24 @@ class Player {
                     }
                     
                     String fireCommand = s.fire(handler.getShips());
-                    if(frame%2==0 && fireCommand.length()>1){ //if ship within 5 blocks and even frame
+                    if(frame%3==0 && fireCommand.length()>1){ //if ship within 5 blocks and every four frames
                         command = fireCommand;
                     }
                     
-                    System.out.println(command);
+                    if(command.length()>0){
+                        System.out.println(command);
+                    }
+                    else{
+                        try{
+                            command = s.move(handler.getBarrels()); //do something
+                            if(!(command.length()>0)){
+                                command = "WAIT";
+                            }  
+                        }
+                        catch(NullPointerException e){
+                            System.out.println("WAIT");
+                        }
+                    }
                 }
                 
             }
@@ -154,8 +167,8 @@ class Ship {
                 first = false;
             }
             else{
-                if(hexDistance(this.getX(), this.getY(), ba.getX(), ba.getY()) <
-                   hexDistance(this.getX(), this.getY(), closest.getX(), closest.getY())
+                if(HexDistance.distance(this.getCoord(), ba.getCoord()) <
+                   HexDistance.distance(this.getCoord(), closest.getCoord())
                 ){
                     closest = ba;
                 }
@@ -165,7 +178,7 @@ class Ship {
         return "MOVE " + closest.getX() + " " + closest.getY();
     }
     
-    public String fire(ArrayList<Ship> ships){ //to closest carrel 
+    public String fire(ArrayList<Ship> ships) throws NullPointerException{ //to closest carrel 
         Ship closest = null;
         boolean first = true;
         for(Ship s : ships){
@@ -175,8 +188,8 @@ class Ship {
                     first = false;
                 }
                 else{
-                    if(hexDistance(this.getX(), this.getY(), s.getX(), s.getY()) <
-                       hexDistance(this.getX(), this.getY(), closest.getX(), closest.getY())
+                    if(HexDistance.distance(this.getCoord(), s.getCoord()) <
+                       HexDistance.distance(this.getCoord(), closest.getCoord())
                     ){
                         closest = s;
                     }
@@ -184,49 +197,50 @@ class Ship {
             }
         }
         //if ship is within 5 units
-        if(hexDistance(this.getX(), this.getY(), closest.getX(), closest.getY()) <= 10){
+        if(HexDistance.distance(this.getCoord(), closest.getCoord()) <= 10){
+            //look at each coord in the enemy ship's trajectory
+            if(closest.getSpeed()==0){return "FIRE "+closest.getX()+" "+closest.getY();}
+            ArrayList<Coordinate> targets = closest.trajectory();
+            Coordinate frontOfShip = coordinateMovedByRotation( this.getCoord(), this.getRot() );
+            for(int i = 0; i<targets.size(); i++){ 
+                Coordinate target = targets.get(i);
+                //how many turns for enemy to reach the point
+                int enemyDistanceInTurns = HexDistance.distance(closest.getCoord(), target)/2;
+                
+                //how many turns for cannonball to go from front of ship to target
+                int cannonDistanceInTurns = 1 + Math.round(HexDistance.distance(frontOfShip, target)/3);
+
+                
+                if(enemyDistanceInTurns == cannonDistanceInTurns-1){
+                    return "FIRE "+target.getX()+" " + target.getY();
+                }
+                                                                        
+                                                                      
+            }
             
-            
-            return "FIRE 10 10";
         }
         else{
             return "";
         }
+        return "";
     } 
     
-    //actual distance betwen two points
-    //public double distanceFrom(int xFrom, int yFrom, int xTo, int yTo){
-    //    int a = xTo - xFrom;
-    //    int b = yTo - yFrom;
-    //    double c = Math.sqrt(Math.pow(a,2) + Math.pow(b,2));
-    //    
-    //    return c;
-    //}
-    
-    //distance (moves required) between two points on the hex grid
-    public static int hexDistance(int xf, int yf, int xt, int yt){
-        int x1 = xf - (yf - (xf&1)) / 2;
-        int z1 = yf;
-        int y1 = -x1 - z1;
-        
-        int x2 = xt - (yt - (xt&1)) / 2;
-        int z2 = yt;
-        int y2 = -x2 - z2;
-        
-        int m = Math.max(Math.abs(x1 - x2), Math.abs(y1 - y2));
-    	return Math.max(m, Math.abs(z1 - z2));
-    }
-    
     public ArrayList<Coordinate> trajectory(){
+        
         ArrayList<Coordinate> attackPoints = new ArrayList<Coordinate>();
         
+        if(this.speed==0){
+            attackPoints.add(this.getCoord());
+            return attackPoints;
+        }
+        
         if(this.getRot()==0){
-            for(int i = this.getX()+1; i<23; i++){
+            for(int i = this.getX(); i<23; i++){
                 attackPoints.add(new Coordinate(i, this.getY()));
             }
         }
         else if(this.getRot()==3){
-            for(int i = this.getX()-1; i>=0; i--){
+            for(int i = this.getX(); i>=0; i--){
                 attackPoints.add(new Coordinate(i, this.getY()));
             }
         }
@@ -255,7 +269,13 @@ class Ship {
     }
     
     public static Coordinate coordinateMovedByRotation(Coordinate c, int rot){
-        if(rot==1){
+        if(rot==0){
+            return new Coordinate(c.getX()+1, c.getY());
+        }
+        else if(rot==3){
+            return new Coordinate(c.getX()-1, c.getY());
+        }
+        else if(rot==1){
             //odd-even coord rot=1
             if(c.getX()%2==1 && c.getY()%2==0){
                 return new Coordinate(c.getX(), c.getY()-1);
@@ -269,7 +289,7 @@ class Ship {
                 return new Coordinate(c.getX(), c.getY()-1);
             }
             //even-odd coord rot=1
-            if(c.getX()%2==0 && c.getY()%2==0){
+            if(c.getX()%2==0 && c.getY()%2==1){
                 return new Coordinate(c.getX()+1, c.getY()-1);
             }
         }
@@ -287,7 +307,7 @@ class Ship {
                 return new Coordinate(c.getX()-1, c.getY()-1);
             }
             //even-odd coord rot=2
-            if(c.getX()%2==0 && c.getY()%2==0){
+            if(c.getX()%2==0 && c.getY()%2==1){
                 return new Coordinate(c.getX(), c.getY()-1);
             }
         }
@@ -305,7 +325,7 @@ class Ship {
                 return new Coordinate(c.getX()-1, c.getY()+1);
             }
             //even-odd coord rot=4
-            if(c.getX()%2==0 && c.getY()%2==0){
+            if(c.getX()%2==0 && c.getY()%2==1){
                 return new Coordinate(c.getX(), c.getY()+1);
             }
         }
@@ -323,7 +343,7 @@ class Ship {
                 return new Coordinate(c.getX(), c.getY()+1);
             }
             //even-odd coord rot=5
-            if(c.getX()%2==0 && c.getY()%2==0){
+            if(c.getX()%2==0 && c.getY()%2==1){
                 return new Coordinate(c.getX()+1, c.getY()+1);
             }
         }
@@ -352,6 +372,7 @@ class Barrel {
         id = _i;
     }
     
+    public Coordinate getCoord(){ return coord; }
     public int getX(){ return coord.getX(); }
     public int getY(){ return coord.getY(); }
     public int getRum(){ return rum; }
@@ -382,4 +403,84 @@ class Coordinate {
     public int getX(){ return x; }
     public int getY(){ return y; }   
 }
-        
+
+
+class Hex
+{
+    public Hex(int q, int r, int s)
+    {
+        this.q = q;
+        this.r = r;
+        this.s = s;
+    }
+    public final int q;
+    public final int r;
+    public final int s;
+
+    static public Hex subtract(Hex a, Hex b)
+    {
+        return new Hex(a.q - b.q, a.r - b.r, a.s - b.s);
+    }
+
+
+    static public Hex scale(Hex a, int k)
+    {
+        return new Hex(a.q * k, a.r * k, a.s * k);
+    }
+
+    static public int length(Hex hex)
+    {
+        return (int)((Math.abs(hex.q) + Math.abs(hex.r) + Math.abs(hex.s)) / 2);
+    }
+
+
+    static public int distance(Hex a, Hex b)
+    {
+        return Hex.length(Hex.subtract(a, b));
+    }
+
+}
+
+class OffsetCoord
+{
+    public OffsetCoord(int col, int row)
+    {
+        this.col = col;
+        this.row = row;
+    }
+    public final int col;
+    public final int row;
+    static public int EVEN = 1;
+    static public int ODD = -1;
+
+    static public Hex roffsetToCube(int offset, OffsetCoord h)
+    {
+        int q = h.col - (int)((h.row + offset * (h.row & 1)) / 2);
+        int r = h.row;
+        int s = -q - r;
+        return new Hex(q, r, s);
+    }
+
+}
+
+class HexDistance
+{
+    static public int distance(Coordinate from, Coordinate to){
+        return Hex.distance( 
+            OffsetCoord.roffsetToCube(
+                0,
+                new OffsetCoord(
+                    from.getX(), 
+                    from.getY()
+                )
+            ), 
+            OffsetCoord.roffsetToCube(
+                0,
+                new OffsetCoord(
+                    to.getX(),
+                    to.getY()
+                )
+            )
+        );
+    }
+}
