@@ -4,14 +4,15 @@ import java.math.*;
 
 class Player {
 
-    public static void main(String args[]) throws NullPointerException {
+    public static void main(String args[]){
         Scanner in = new Scanner(System.in);
         
-        ShipHandler handler = new ShipHandler();
         String command = "";
-        int frame = 0; //counts game frames. used for deciding when to fire, eg. every 2 frames
+        int canFire = 0; //counts game frames. used for deciding when to fire, eg. every 2 frames
         // game loop
         while (true) {
+			
+			ShipHandler handler = new ShipHandler();
             int myShipCount = in.nextInt(); // the number of remaining ships
             int entityCount = in.nextInt(); // the number of entities (e.g. ships, mines or cannonballs)
             
@@ -39,45 +40,40 @@ class Player {
             
             for(Ship s : handler.getShips()) { //for every ship
                 if(s.getFoe() == 1) { //if the ship is controlled by us
-                                        
-                    try{
-                        command = s.move(handler.getBarrels()); //do something
-                        if(!(command.length()>0)){
-                            command = "WAIT";
-                        }  
-                    }
-                    catch(NullPointerException e){
-                        System.out.println("WAIT");
-                    }
                     
                     String fireCommand = s.fire(handler.getShips());
-                    if(frame%3==0 && fireCommand.length()>1){ //if ship within 5 blocks and every four frames
-                        command = fireCommand;
-                    }
-                    
-                    if(command.length()>0){
-                        System.out.println(command);
+                    if(canFire%3==0){
+                        if(fireCommand.length()>1){
+                            System.out.println(fireCommand);
+                        }
+                        else{
+                            canFire--;
+                            command = s.move(handler.getBarrels());
+                            if(command.length()>1){
+                                System.out.println(command);
+                            }
+                            else{
+                                System.out.println("WAIT");
+                            }
+                                //eventually end-game case
+                                
+                        }
                     }
                     else{
-                        try{
-                            command = s.move(handler.getBarrels()); //do something
-                            if(!(command.length()>0)){
-                                command = "WAIT";
-                            }  
+                        command = s.move(handler.getBarrels());
+                        if(command.length()>1){
+                            System.out.println(command);
                         }
-                        catch(NullPointerException e){
+                        else{
                             System.out.println("WAIT");
                         }
                     }
                 }
                 
             }
-            handler.clearBarrels();
-            handler.clearShips();
-            handler.clearMines();
             command = "";
             
-            frame++;
+            canFire++;
         }   
     }
 }
@@ -158,7 +154,8 @@ class Ship {
         id = 0;
     }
     
-    public String move(ArrayList<Barrel> barrels){ //to closest carrel 
+    public String move(ArrayList<Barrel> barrels){
+        if(barrels.size()==0){return "";}
         Barrel closest = null;
         boolean first = true;
         for(Barrel ba : barrels){
@@ -174,6 +171,7 @@ class Ship {
                 }
             }
         }
+		coordinateMovedByRotation(this.getCoord(), this.getRot());
         
         return "MOVE " + closest.getX() + " " + closest.getY();
     }
@@ -196,31 +194,31 @@ class Ship {
                 }
             }
         }
-        //if ship is within 5 units
-        if(HexDistance.distance(this.getCoord(), closest.getCoord()) <= 10){
-            //look at each coord in the enemy ship's trajectory
-            if(closest.getSpeed()==0){return "FIRE "+closest.getX()+" "+closest.getY();}
-            ArrayList<Coordinate> targets = closest.trajectory();
-            Coordinate frontOfShip = coordinateMovedByRotation( this.getCoord(), this.getRot() );
-            for(int i = 0; i<targets.size(); i++){ 
-                Coordinate target = targets.get(i);
+        //look at each coord in the enemy ship's trajectory
+        if(closest.getSpeed()==0){return "FIRE "+closest.getX()+" "+closest.getY();}
+        ArrayList<Coordinate> targets = closest.trajectory();
+        Coordinate frontOfShip = coordinateMovedByRotation( this.getCoord(), this.getRot() );
+        for(int i = 0; i<targets.size(); i++){ 
+            
+            Coordinate target = targets.get(i);
+            //check if HexDistance from front of ship to target is less than or equal to 10
+            if(HexDistance.distance(frontOfShip, target)<=10){
+            
                 //how many turns for enemy to reach the point
                 int enemyDistanceInTurns = HexDistance.distance(closest.getCoord(), target)/2;
                 
                 //how many turns for cannonball to go from front of ship to target
                 double dist = HexDistance.distance(frontOfShip, target)/3.0;
                 int cannonDistanceInTurns = 1 + (int)(Math.round(dist));
-
+    
                 
                 if(enemyDistanceInTurns == cannonDistanceInTurns-1){
                     target = coordinateMovedByRotation( target, closest.getRot());
                     return "FIRE "+target.getX()+" " + target.getY();
-                }                                                      
+                }  
             }
         }
-        else{
-            return "";
-        }
+        
         return "";
     } 
     
