@@ -86,6 +86,7 @@ class ShipHandler {
     private ArrayList<Barrel> barrels;
     private ArrayList<Mine> mines;
     private ArrayList<Ball> balls;
+    private ArrayList<Coordinate> nextMoves;
     
     
     public ShipHandler(){
@@ -93,6 +94,7 @@ class ShipHandler {
         barrels = new ArrayList<Barrel>();
         mines = new ArrayList<Mine>();
         balls = new ArrayList<Ball>();
+        nextMoves = new ArrayList<Coordinate>();
     }
     
     public void addShip(Ship s){
@@ -135,6 +137,7 @@ class Ship {
     private int rum;
     private int foe;
     private int id;
+    int endMove = 0;
     
     public Ship(int _x, int _y, int ro, int s, int r, int f, int i){
         coord = new Coordinate(_x,_y);
@@ -180,8 +183,28 @@ class Ship {
     
     //handles movement when there are no barrels left
     public String moveNoBarrels(ArrayList<Mine> mines, ArrayList<Ball> balls){
-        //no method implementation yet
-        return "";
+        
+        
+        
+        for (Mine m : mines) {
+            if (m.getX() == coordinateMovedByRotation(coord, rot).getX() && m.getY() == coordinateMovedByRotation(coord, rot).getY()) {
+                return "STARBOARD";
+            }
+        }
+        
+        if (endMove % 5 == 0) {
+            
+            
+            Random rand = new Random();
+        
+            int MoveX = rand.nextInt((19 - 3) + 1) + 5;
+            int MoveY = rand.nextInt((17 - 3) + 1) + 4;
+            endMove++;
+            return "MOVE " + MoveX + " " + MoveY;
+        
+        }
+        endMove++;
+        return "WAIT";
     }
         
     
