@@ -34,6 +34,10 @@ class Player {
                     Ship s1 = new Ship(x_, y_, arg1, arg2, arg3, arg4, entityId);
                     handler.addShip(s1);
                 }
+                if(entityType.equals("CANNONBALL")){
+                    Ball b = new Ball(x_, y_, arg1, arg2);
+                    handler.addBall(b);
+                }
             }
             
             
@@ -47,8 +51,7 @@ class Player {
                             System.out.println(fireCommand);
                         }
                         else{
-                            canFire--;
-                            command = s.move(handler.getBarrels());
+                            command = s.move(handler.getBarrels(), handler.getMines(), handler.getBalls());
                             if(command.length()>1){
                                 System.out.println(command);
                             }
@@ -60,7 +63,7 @@ class Player {
                         }
                     }
                     else{
-                        command = s.move(handler.getBarrels());
+                        command = s.move(handler.getBarrels(), handler.getMines(), handler.getBalls());
                         if(command.length()>1){
                             System.out.println(command);
                         }
@@ -80,15 +83,16 @@ class Player {
 
 class ShipHandler {
     private ArrayList<Ship> ships;
-    
     private ArrayList<Barrel> barrels;
-    
     private ArrayList<Mine> mines;
+    private ArrayList<Ball> balls;
+    
     
     public ShipHandler(){
         ships = new ArrayList<Ship>();
         barrels = new ArrayList<Barrel>();
         mines = new ArrayList<Mine>();
+        balls = new ArrayList<Ball>();
     }
     
     public void addShip(Ship s){
@@ -103,16 +107,8 @@ class ShipHandler {
         mines.add(m);
     }
     
-    public void clearBarrels(){
-        barrels.clear();
-    }
-    
-    public void clearShips(){
-        ships.clear();
-    }
-    
-    public void clearMines(){
-        mines.clear();
+    public void addBall(Ball b){
+        balls.add(b);
     }
     
     public ArrayList<Ship> getShips(){
@@ -125,6 +121,10 @@ class ShipHandler {
     
     public ArrayList<Mine> getMines() {
         return mines;
+    }
+    
+    public ArrayList<Ball> getBalls() {
+        return balls;
     }
 }
 
@@ -154,8 +154,10 @@ class Ship {
         id = 0;
     }
     
-    public String move(ArrayList<Barrel> barrels){
-        if(barrels.size()==0){return "";}
+    public String move(ArrayList<Barrel> barrels, ArrayList<Mine> mines, ArrayList<Ball> balls){
+        if(barrels.size()==0){
+            return moveNoBarrels(mines, balls);
+        }
         Barrel closest = null;
         boolean first = true;
         for(Barrel ba : barrels){
@@ -176,6 +178,13 @@ class Ship {
         return "MOVE " + closest.getX() + " " + closest.getY();
     }
     
+    //handles movement when there are no barrels left
+    public String moveNoBarrels(ArrayList<Mine> mines, ArrayList<Ball> balls){
+        //no method implementation yet
+        return "";
+    }
+        
+    
     public String fire(ArrayList<Ship> ships) throws NullPointerException{
         Ship closest = null;
         boolean first = true;
@@ -194,10 +203,14 @@ class Ship {
                 }
             }
         }
-        //look at each coord in the enemy ship's trajectory
-        if(closest.getSpeed()==0){return "FIRE "+closest.getX()+" "+closest.getY();}
-        ArrayList<Coordinate> targets = closest.trajectory();
+        
         Coordinate frontOfShip = coordinateMovedByRotation( this.getCoord(), this.getRot() );
+        
+        if(closest.getSpeed()==0 && HexDistance.distance(frontOfShip, closest.getCoord())<=10){
+            return "FIRE "+closest.getX()+" "+closest.getY();
+        }
+        ArrayList<Coordinate> targets = closest.trajectory();
+        
         for(int i = 0; i<targets.size(); i++){ 
             
             Coordinate target = targets.get(i);
@@ -213,7 +226,6 @@ class Ship {
     
                 
                 if(enemyDistanceInTurns == cannonDistanceInTurns-1){
-                    target = coordinateMovedByRotation( target, closest.getRot());
                     return "FIRE "+target.getX()+" " + target.getY();
                 }  
             }
@@ -399,6 +411,24 @@ class Coordinate {
     
     public int getX(){ return x; }
     public int getY(){ return y; }   
+}
+
+class Ball {
+    private Coordinate target;
+    private int shipID;
+    private int turnsToImpact;
+    
+    public Ball(int x, int y, int f, int t){
+        target = new Coordinate(x,y);
+        shipID = f;
+        turnsToImpact = t;
+    }
+    
+    public int getTargetX(){ return target.getX(); }
+    public int getTargetY(){ return target.getY(); }
+    public Coordinate getTarget(){ return target; }
+    public int getShipID(){ return shipID; }
+    public int getTurnsToImpact(){ return turnsToImpact; }
 }
 
 
