@@ -73,13 +73,10 @@ class ShipHandler {
         mines = new ArrayList<Mine>();
         balls = new ArrayList<Ball>();
         nextMoves = new ArrayList<Coordinate>();
-<<<<<<< HEAD
     }
     
     public static int oppositeRotation(int i){
         return (i+3)%6;
-=======
->>>>>>> af4c2a5799819c3a4a78b8ee27a162c6666654ed
     }
     
     public void addShip(Ship s){
@@ -147,7 +144,7 @@ class Ship {
         String avoidBalls = avoidBalls(balls);
         if(avoidBalls.length()>1){ return avoidBalls; }
         
-        if(frame%2==0){
+        if(frame%3==0){
             
             String fire = fire(ships);
             if(fire.length()>1){ return fire; }
@@ -214,31 +211,17 @@ class Ship {
     //handles movement when there are no barrels left
     public String moveNoBarrels(ArrayList<Mine> mines, ArrayList<Ball> balls){
         
-<<<<<<< HEAD
         Coordinate frontOfShip = coordinateMovedByRotation( this.getCoord(), this.getRot() );
 		Coordinate nextFrontOfShip = coordinateMovedByRotation( frontOfShip, this.getRot() );
         
         for (Mine m : mines) {
             if (m.getX() == nextFrontOfShip.getX() && m.getY() == nextFrontOfShip.getY()) {
-=======
-        
-        
-        for (Mine m : mines) {
-            if (m.getX() == coordinateMovedByRotation(coord, rot).getX() && m.getY() == coordinateMovedByRotation(coord, rot).getY()) {
->>>>>>> af4c2a5799819c3a4a78b8ee27a162c6666654ed
                 return "STARBOARD";
             }
         }
         
         if (endMove % 5 == 0) {
-<<<<<<< HEAD
             Random rand = new Random();
-=======
-            
-            
-            Random rand = new Random();
-        
->>>>>>> af4c2a5799819c3a4a78b8ee27a162c6666654ed
             int MoveX = rand.nextInt((19 - 3) + 1) + 5;
             int MoveY = rand.nextInt((17 - 3) + 1) + 4;
             endMove++;
