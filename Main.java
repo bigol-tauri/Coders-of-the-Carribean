@@ -8,7 +8,7 @@ class Player {
         Scanner in = new Scanner(System.in);
         
         String command = "";
-        int canFire = 0; //counts game frames. used for deciding when to fire, eg. every 2 frames
+        int canFire = 0;
         // game loop
         while (true) {
 			
@@ -45,32 +45,10 @@ class Player {
             for(Ship s : handler.getShips()) { //for every ship
                 if(s.getFoe() == 1) { //if the ship is controlled by us
                     
-                    String fireCommand = s.fire(handler.getShips());
-                    if(canFire%3==0){
-                        if(fireCommand.length()>1){
-                            System.out.println(fireCommand);
-                        }
-                        else{
-                            command = s.move(handler.getBarrels(), handler.getMines(), handler.getBalls());
-                            if(command.length()>1){
-                                System.out.println(command);
-                            }
-                            else{
-                                System.out.println("WAIT");
-                            }
-                                //eventually end-game case
-                                
-                        }
-                    }
-                    else{
-                        command = s.move(handler.getBarrels(), handler.getMines(), handler.getBalls());
-                        if(command.length()>1){
-                            System.out.println(command);
-                        }
-                        else{
-                            System.out.println("WAIT");
-                        }
-                    }
+                    System.out.println(s.action(canFire, handler.getBarrels(),
+                                                handler.getShips(),
+                                                handler.getMines(),
+                                                handler.getBalls()));
                 }
                 
             }
@@ -86,6 +64,7 @@ class ShipHandler {
     private ArrayList<Barrel> barrels;
     private ArrayList<Mine> mines;
     private ArrayList<Ball> balls;
+    private ArrayList<Coordinate> nextMoves;
     
     
     public ShipHandler(){
@@ -93,6 +72,11 @@ class ShipHandler {
         barrels = new ArrayList<Barrel>();
         mines = new ArrayList<Mine>();
         balls = new ArrayList<Ball>();
+        nextMoves = new ArrayList<Coordinate>();
+    }
+    
+    public static int oppositeRotation(int i){
+        return (i+3)%6;
     }
     
     public void addShip(Ship s){
@@ -135,6 +119,7 @@ class Ship {
     private int rum;
     private int foe;
     private int id;
+    int endMove = 0;
     
     public Ship(int _x, int _y, int ro, int s, int r, int f, int i){
         coord = new Coordinate(_x,_y);
@@ -154,10 +139,56 @@ class Ship {
         id = 0;
     }
     
+    public String action(int frame, ArrayList<Barrel> barrels, ArrayList<Ship> ships, ArrayList<Mine> mines, ArrayList<Ball> balls){
+        
+        String avoidBalls = avoidBalls(balls);
+        if(avoidBalls.length()>1){ return avoidBalls; }
+        
+        if(frame%2==0){
+            
+            String fire = fire(ships);
+            if(fire.length()>1){ return fire; }
+        }
+        
+        String move = move(barrels, mines, balls);
+        if(move.length()>1){ return move; }
+        
+        return "WAIT";
+    }
+    
+    public String avoidBalls(ArrayList<Ball> balls){
+     //check for ball collisions
+        for(Ball b: balls){
+            if(b.getTurnsToImpact()<=3){
+                if(this.speed != 0){
+                //our position in two turns, center and front of ship
+                    ArrayList<Coordinate> traj = trajectory();
+                    if(traj.size()>=3){
+                        if(traj.get(2) == b.getTarget() || traj.get(1) == b.getTarget()){
+                        //speed up or change rotation by 1
+                            return "FASTER";
+                        }
+                    }
+                }
+                else{
+                    if(this.coord == b.getTarget() || 
+                       coordinateMovedByRotation(this.coord, ShipHandler.oppositeRotation(this.rot)) == b.getTarget()){
+                        //speed up or change rotation by 1
+                        Coordinate oneFurther = coordinateMovedByRotation(this.coord, this.rot);
+                        Coordinate twoFurther = coordinateMovedByRotation(oneFurther, this.rot);
+                        return "MOVE "+twoFurther.getX() + " " + twoFurther.getY();
+                    }
+                }
+            }
+        }
+        return "";
+    }
+    
     public String move(ArrayList<Barrel> barrels, ArrayList<Mine> mines, ArrayList<Ball> balls){
         if(barrels.size()==0){
             return moveNoBarrels(mines, balls);
         }
+
         Barrel closest = null;
         boolean first = true;
         for(Barrel ba : barrels){
@@ -173,15 +204,32 @@ class Ship {
                 }
             }
         }
-		coordinateMovedByRotation(this.getCoord(), this.getRot());
         
         return "MOVE " + closest.getX() + " " + closest.getY();
     }
     
     //handles movement when there are no barrels left
     public String moveNoBarrels(ArrayList<Mine> mines, ArrayList<Ball> balls){
-        //no method implementation yet
-        return "";
+        
+        Coordinate frontOfShip = coordinateMovedByRotation( this.getCoord(), this.getRot() );
+		Coordinate nextFrontOfShip = coordinateMovedByRotation( frontOfShip, this.getRot() );
+        
+        for (Mine m : mines) {
+            if (m.getX() == nextFrontOfShip.getX() && m.getY() == nextFrontOfShip.getY()) {
+                return "STARBOARD";
+            }
+        }
+        
+        if (endMove % 5 == 0) {
+            Random rand = new Random();
+            int MoveX = rand.nextInt((19 - 3) + 1) + 5;
+            int MoveY = rand.nextInt((17 - 3) + 1) + 4;
+            endMove++;
+            return "MOVE " + MoveX + " " + MoveY;
+        
+        }
+        endMove++;
+        return "WAIT";
     }
         
     
