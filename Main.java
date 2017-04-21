@@ -296,9 +296,11 @@ class Ship {
 			        else{
 			            //try to divert course   
 			        }
+			    }
 			    
 			    //if back of ship will be hit in two turns
 			    Coordinate check3 = cMBR(check1, ((this.rot+3)%6));
+			    if(check3.getX()==b.getTargetX() && check3.getY()==b.getTargetY()){
 			        if(this.speed == 0 || this.speed ==1){
 			            return "FASTER turns2 back";
 			        }
