@@ -145,7 +145,7 @@ class Ship {
             if(fire.length()>1){ return fire; }
         }
         
-        String move = move(barrels, mines, balls);
+        String move = move(barrels, mines, balls, ships);
         if(move.length()>1){ return move; }
         
         return "WAIT";
@@ -320,9 +320,83 @@ class Ship {
         return "";
     }
     
-    public String move(ArrayList<Barrel> barrels, ArrayList<Mine> mines, ArrayList<Ball> balls){
+    public String move(ArrayList<Barrel> barrels, ArrayList<Mine> mines, ArrayList<Ball> balls, ArrayList<Ship> ships){
 		if(barrels.size()==0){
-            return moveNoBarrels(mines, balls);
+            return moveNoBarrels(mines, balls, ships);
+        }
+        
+        
+        if(this.coord.getY() == 20){
+            if(this.rot==3){
+                return "STARBOARD";
+            }
+            else if(this.rot==0){
+                return "PORT";
+            }
+            else if(this.rot==4){
+                return "STARBOARD";
+            }
+            else if(this.rot==5){
+                return "PORT";
+            }
+            else if(this.rot==1){
+                return "FASTER";
+            }
+            else{return "FASTER";}
+        }
+        else if(this.coord.getY() == 0){
+            if(this.rot==3){
+                return "PORT";
+            }
+            else if(this.rot==0){
+                return "STARBOARD";
+            }
+            else if(this.rot==4){
+                return "FASTER";
+            }
+            else if(this.rot==5){
+                return "FASTER";
+            }
+            else if(this.rot==1){
+                return "STARBOARD";
+            }
+            else{return "PORT";}
+        }
+        else if(this.coord.getX() == 0){
+            if(this.rot==3){
+                return "PORT";
+            }
+            else if(this.rot==0){
+                return "FASTER";
+            }
+            else if(this.rot==4){
+                return "PORT";
+            }
+            else if(this.rot==5){
+                return "FASTER";
+            }
+            else if(this.rot==1){
+                return "FASTER";
+            }
+            else{return "STARBOARD";}
+        }
+        else if(this.coord.getX() == 22){
+            if(this.rot==3){
+                return "FASTER";
+            }
+            else if(this.rot==0){
+                return "PORT";
+            }
+            else if(this.rot==4){
+                return "FASTER";
+            }
+            else if(this.rot==5){
+                return "STARBOARD";
+            }
+            else if(this.rot==1){
+                return "PORT";
+            }
+            else{return "FASTER";}
         }
 		
 		//find closest barrel
@@ -353,10 +427,10 @@ class Ship {
 		Coordinate c5 = new Coordinate(0,0);
 		Coordinate cFASTER = new Coordinate(0,0);	
 		Coordinate center = this.coord;
-		if(this.speed == 1){
+		if(this.speed == 1 && center.getX()>0 && center.getX()<22 && center.getY()>0 && center.getY()<20){
 			center = cMBR(center, this.rot);
 		}
-		else if(speed == 2){
+		else if(speed == 2 && center.getX()>1 && center.getX()<21 && center.getY()>1 && center.getY()<19){
 			center = cMBR(cMBR(center, this.rot), this.rot);
 		}
 		c0 = cMBR(center, this.rot);
@@ -366,7 +440,9 @@ class Ship {
 		c4 = cMBR(center, ((this.rot+4)%6));
 		c5 = cMBR(center, ((this.rot+5)%6));
 		if(speed == 0 || speed == 1){
-			cFASTER = cMBR(c0, this.rot);
+		    if(c0.getX()>0 && c0.getX()<22 && c0.getY()>0 && c0.getY()<20){
+			    cFASTER = cMBR(c0, this.rot);
+		    }
 		}
 		
 		if(speed==0){
@@ -382,44 +458,44 @@ class Ship {
 			double cVg_FASTER = 0; //center, c0, cFaster
 			
 			int c_c0 = 0;
-			if(mineThere(c0, mines)){c_c0++;}
+			if(mineThere(c0, mines)){c_c0+=2;}
 			if(ballThereNextTurn(c0, balls)){c_c0++;}
-			if(!inRange(c0)){c_c0 += 100; } //can't do this if not in range
+			if(!inRange(c0)){c_c0 += 1; } //can't do this if not in range
 			
 			int c_c1 = 0;
-			if(mineThere(c1, mines)){c_c1++;}
+			if(mineThere(c1, mines)){c_c1+=2;}
 			if(ballThereNextTurn(c1, balls)){c_c1++;}
-			if(!inRange(c1)){c_c1 += 100; } //can't do this if not in range
+			if(!inRange(c1)){c_c1 += 1; } //can't do this if not in range
 			
 			int c_c2 = 0;
-			if(mineThere(c2, mines)){c_c2++;}
+			if(mineThere(c2, mines)){c_c2+=2;}
 			if(ballThereNextTurn(c2, balls)){c_c2++;}
-			if(!inRange(c2)){c_c2 += 100; } //can't do this if not in range
+			if(!inRange(c2)){c_c2 += 1; } //can't do this if not in range
 			
 			int c_c3 = 0;
-			if(mineThere(c3, mines)){c_c3++;}
+			if(mineThere(c3, mines)){c_c3+=2;}
 			if(ballThereNextTurn(c3, balls)){c_c3++;}
-			if(!inRange(c3)){c_c3 += 100; } //can't do this if not in range
+			if(!inRange(c3)){c_c3 += 1; } //can't do this if not in range
 			
 			int c_c4 = 0;
-			if(mineThere(c4, mines)){c_c4++;}
+			if(mineThere(c4, mines)){c_c4+=2;}
 			if(ballThereNextTurn(c4, balls)){c_c4++;}
-			if(!inRange(c4)){c_c4 += 100; } //can't do this if not in range
+			if(!inRange(c4)){c_c4 += 1; } //can't do this if not in range
 			
 			int c_c5 = 0;
-			if(mineThere(c5, mines)){c_c5++;}
+			if(mineThere(c5, mines)){c_c5+=2;}
 			if(ballThereNextTurn(c5, balls)){c_c5++;}
-			if(!inRange(c5)){c_c5 += 100; } //can't do this if not in range
+			if(!inRange(c5)){c_c5 += 0; } //can't do this if not in range
 			
 			int c_cFASTER = 0;
 			if(mineThere(cFASTER, mines)){c_cFASTER++;}
 			if(ballThereNextTurn(cFASTER, balls)){c_cFASTER++;}
-			if(!inRange(cFASTER)){c_cFASTER += 100; } //can't do this if not in range
+			if(!inRange(cFASTER)){c_cFASTER += 1; } //can't do this if not in range
 			
 			int c_center = 0;
 			if(mineThere(center, mines)){c_center++;}
 			if(ballThereNextTurn(center, balls)){c_center++;}
-			if(!inRange(center)){c_center += 100; } //can't do this if not in range
+			if(!inRange(center)){c_center += 1; } //can't do this if not in range
 			
 			
 			int distanceWAIT = HexDistance.distance(c0, closest.getCoord());
@@ -440,7 +516,7 @@ class Ship {
 			cVg_WAIT = -1 - (c_c3 + c_center + c_c0) - converted[0];
 			cVg_PORT = 0 - (c_c4 + c_center + c_c1) - converted[1];
 			cVg_STARBOARD = 0 - (c_c2 + c_center + c_c5) - converted[2];
-			cVg_FASTER = 0 - (c_center + c_c0 + c_cFASTER) - converted[3];
+			cVg_FASTER = 0.1 - (c_center + c_c0 + c_cFASTER) - converted[3];
 			
 			double[] data = {cVg_WAIT, cVg_PORT, cVg_STARBOARD, cVg_FASTER};
 			double maxScore = -2000;
@@ -465,44 +541,44 @@ class Ship {
 			double cVg_SLOWER = 0; //c3, center, c0
 			
 			int c_c0 = 0;
-			if(mineThere(c0, mines)){c_c0++;}
+			if(mineThere(c0, mines)){c_c0+=2;}
 			if(ballThereNextTurn(c0, balls)){c_c0++;}
-			if(!inRange(c0)){c_c0 += 100; } //can't do this if not in range
+			if(!inRange(c0)){c_c0 += 1; } //can't do this if not in range
 			
 			int c_c1 = 0;
-			if(mineThere(c1, mines)){c_c1++;}
+			if(mineThere(c1, mines)){c_c1+=2;}
 			if(ballThereNextTurn(c1, balls)){c_c1++;}
-			if(!inRange(c1)){c_c1 += 100; } //can't do this if not in range
+			if(!inRange(c1)){c_c1 += 1; } //can't do this if not in range
 			
 			int c_c2 = 0;
-			if(mineThere(c2, mines)){c_c2++;}
+			if(mineThere(c2, mines)){c_c2+=2;}
 			if(ballThereNextTurn(c2, balls)){c_c2++;}
-			if(!inRange(c2)){c_c2 += 100; } //can't do this if not in range
+			if(!inRange(c2)){c_c2 += 1; } //can't do this if not in range
 			
 			int c_c3 = 0;
-			if(mineThere(c3, mines)){c_c3++;}
+			if(mineThere(c3, mines)){c_c3+=2;}
 			if(ballThereNextTurn(c3, balls)){c_c3++;}
-			if(!inRange(c3)){c_c3 += 100; } //can't do this if not in range
+			if(!inRange(c3)){c_c3 += 1; } //can't do this if not in range
 			
 			int c_c4 = 0;
-			if(mineThere(c4, mines)){c_c4++;}
+			if(mineThere(c4, mines)){c_c4+=2;}
 			if(ballThereNextTurn(c4, balls)){c_c4++;}
-			if(!inRange(c4)){c_c4 += 100; } //can't do this if not in range
+			if(!inRange(c4)){c_c4 += 1; } //can't do this if not in range
 			
 			int c_c5 = 0;
-			if(mineThere(c5, mines)){c_c5++;}
+			if(mineThere(c5, mines)){c_c5+=2;}
 			if(ballThereNextTurn(c5, balls)){c_c5++;}
-			if(!inRange(c5)){c_c5 += 100; } //can't do this if not in range
+			if(!inRange(c5)){c_c5 += 1; } //can't do this if not in range
 			
 			int c_cFASTER = 0;
-			if(mineThere(cFASTER, mines)){c_cFASTER++;}
+			if(mineThere(cFASTER, mines)){c_cFASTER+=2;}
 			if(ballThereNextTurn(cFASTER, balls)){c_cFASTER++;}
-			if(!inRange(cFASTER)){c_cFASTER += 100; } //can't do this if not in range
+			if(!inRange(cFASTER)){c_cFASTER += 1; } //can't do this if not in range
 			
 			int c_center = 0;
-			if(mineThere(center, mines)){c_center++;}
+			if(mineThere(center, mines)){c_center+=2;}
 			if(ballThereNextTurn(center, balls)){c_center++;}
-			if(!inRange(center)){c_center += 100; } //can't do this if not in range
+			if(!inRange(center)){c_center += 1; } //can't do this if not in range
 			
 			
 			int distanceWAIT = HexDistance.distance(c0, closest.getCoord());
@@ -618,27 +694,304 @@ class Ship {
 	}
     
     //handles movement when there are no barrels left
-    public String moveNoBarrels(ArrayList<Mine> mines, ArrayList<Ball> balls){
+    public String moveNoBarrels(ArrayList<Mine> mines, ArrayList<Ball> balls, ArrayList<Ship> ships){
         
-        Coordinate frontOfShip = cMBR( this.getCoord(), this.getRot() );
-		Coordinate nextFrontOfShip = cMBR( frontOfShip, this.getRot() );
-        
-        for (Mine m : mines) {
-            if (m.getX() == nextFrontOfShip.getX() && m.getY() == nextFrontOfShip.getY()) {
+        if(this.coord.getY() == 20){
+            if(this.rot==3){
                 return "STARBOARD";
             }
+            else if(this.rot==0){
+                return "PORT";
+            }
+            else if(this.rot==4){
+                return "STARBOARD";
+            }
+            else if(this.rot==5){
+                return "PORT";
+            }
+            else if(this.rot==1){
+                return "FASTER";
+            }
+            else{return "FASTER";}
+        }
+        else if(this.coord.getY() == 0){
+            if(this.rot==3){
+                return "PORT";
+            }
+            else if(this.rot==0){
+                return "STARBOARD";
+            }
+            else if(this.rot==4){
+                return "FASTER";
+            }
+            else if(this.rot==5){
+                return "FASTER";
+            }
+            else if(this.rot==1){
+                return "STARBOARD";
+            }
+            else{return "PORT";}
+        }
+        else if(this.coord.getX() == 0){
+            if(this.rot==3){
+                return "PORT";
+            }
+            else if(this.rot==0){
+                return "FASTER";
+            }
+            else if(this.rot==4){
+                return "PORT";
+            }
+            else if(this.rot==5){
+                return "FASTER";
+            }
+            else if(this.rot==1){
+                return "FASTER";
+            }
+            else{return "STARBOARD";}
+        }
+        else if(this.coord.getX() == 22){
+            if(this.rot==3){
+                return "FASTER";
+            }
+            else if(this.rot==0){
+                return "PORT";
+            }
+            else if(this.rot==4){
+                return "FASTER";
+            }
+            else if(this.rot==5){
+                return "STARBOARD";
+            }
+            else if(this.rot==1){
+                return "PORT";
+            }
+            else{return "FASTER";}
         }
         
-        if (endMove % 5 == 0) {
-            Random rand = new Random();
-            int MoveX = rand.nextInt((19 - 3) + 1) + 5;
-            int MoveY = rand.nextInt((17 - 3) + 1) + 4;
-            endMove++;
-            return "MOVE " + MoveX + " " + MoveY;
-        
+        //find closest enemy ship
+		Ship closest = null;
+        boolean first = true;
+        for(Ship ba : ships){
+            if(first){
+                closest = ba;
+                first = false;
+            }
+            else{
+                if(HexDistance.distance(this.getCoord(), ba.getCoord()) <
+                   HexDistance.distance(this.getCoord(), closest.getCoord())
+                && ba.getFoe()==0 || closest.getFoe()==1){
+                    closest = ba;
+                }
+            }
         }
-        endMove++;
-        return "WAIT";
+		
+		//we need to make sure not to move into a mine or cannon ball. 
+		//We should move manually with port and starboard and speed instead of the move command
+		//consider all of possible Coordinates the ship can occupy in the next turn
+		Coordinate c0 = new Coordinate(0,0);
+		Coordinate c1 = new Coordinate(0,0);
+		Coordinate c2 = new Coordinate(0,0);
+		Coordinate c3 = new Coordinate(0,0);
+		Coordinate c4 = new Coordinate(0,0);
+		Coordinate c5 = new Coordinate(0,0);
+		Coordinate cFASTER = new Coordinate(0,0);	
+		Coordinate center = this.coord;
+		if(this.speed == 1 && center.getX()>0 && center.getX()<22 && center.getY()>0 && center.getY()<20){
+			center = cMBR(center, this.rot);
+		}
+		else if(speed == 2 && center.getX()>1 && center.getX()<21 && center.getY()>1 && center.getY()<19){
+			center = cMBR(cMBR(center, this.rot), this.rot);
+		}
+		c0 = cMBR(center, this.rot);
+		c1 = cMBR(center, ((this.rot+1)%6));
+		c2 = cMBR(center, ((this.rot+2)%6));
+		c3 = cMBR(center, ((this.rot+3)%6));
+		c4 = cMBR(center, ((this.rot+4)%6));
+		c5 = cMBR(center, ((this.rot+5)%6));
+		if(speed == 0 || speed == 1){
+		    if(c0.getX()>0 && c0.getX()<22 && c0.getY()>0 && c0.getY()<20){
+			    cFASTER = cMBR(c0, this.rot);
+		    }
+		}
+		
+		if(speed==0){
+			//possible commands are wait, port, starboard, and faster.
+			//calculate cost vs gain for each of the three commands
+			//based on 
+			//	if a mine is there, 
+			//	if a ball will be there next turn, 
+			//	and if it is closer to the closest barrel
+			double cVg_WAIT = 0; //c3, center, c0
+			double cVg_PORT = 0; //c4, center, c1
+			double cVg_STARBOARD = 0; //c2, center, c5
+			double cVg_FASTER = 0; //center, c0, cFaster
+			
+			int c_c0 = 0;
+			if(mineThere(c0, mines)){c_c0+=2;}
+			if(ballThereNextTurn(c0, balls)){c_c0++;}
+			if(!inRange(c0)){c_c0 += 1; } //can't do this if not in range
+			
+			int c_c1 = 0;
+			if(mineThere(c1, mines)){c_c1+=2;}
+			if(ballThereNextTurn(c1, balls)){c_c1++;}
+			if(!inRange(c1)){c_c1 += 1; } //can't do this if not in range
+			
+			int c_c2 = 0;
+			if(mineThere(c2, mines)){c_c2+=2;}
+			if(ballThereNextTurn(c2, balls)){c_c2++;}
+			if(!inRange(c2)){c_c2 += 1; } //can't do this if not in range
+			
+			int c_c3 = 0;
+			if(mineThere(c3, mines)){c_c3+=2;}
+			if(ballThereNextTurn(c3, balls)){c_c3++;}
+			if(!inRange(c3)){c_c3 += 1; } //can't do this if not in range
+			
+			int c_c4 = 0;
+			if(mineThere(c4, mines)){c_c4+=2;}
+			if(ballThereNextTurn(c4, balls)){c_c4++;}
+			if(!inRange(c4)){c_c4 += 1; } //can't do this if not in range
+			
+			int c_c5 = 0;
+			if(mineThere(c5, mines)){c_c5+=2;}
+			if(ballThereNextTurn(c5, balls)){c_c5++;}
+			if(!inRange(c5)){c_c5 += 1; } //can't do this if not in range
+			
+			int c_cFASTER = 0;
+			if(mineThere(cFASTER, mines)){c_cFASTER+=2;}
+			if(ballThereNextTurn(cFASTER, balls)){c_cFASTER++;}
+			if(!inRange(cFASTER)){c_cFASTER += 1; } //can't do this if not in range
+			
+			int c_center = 0;
+			if(mineThere(center, mines)){c_center+=2;}
+			if(ballThereNextTurn(center, balls)){c_center++;}
+			if(!inRange(center)){c_center += 1; } //can't do this if not in range
+			
+			
+			int distanceWAIT = HexDistance.distance(c0, closest.getCoord());
+			int distancePORT = HexDistance.distance(c1, closest.getCoord());
+			int distanceSTARBOARD = HexDistance.distance(c5, closest.getCoord());
+			int distanceFASTER = HexDistance.distance(cFASTER, closest.getCoord());
+			
+			int[] s = new int[4];
+			s[0]=distanceWAIT;
+			s[1]=distancePORT;
+			s[2]=distanceSTARBOARD;
+			s[3]=distanceFASTER;
+			
+			double[] converted = convertDistances(s);
+			
+			
+			//desirability calculations for all moves
+			cVg_WAIT = -0.1 - (c_c3 + c_center + c_c0) - converted[0];
+			cVg_PORT = 0 - (c_c4 + c_center + c_c1) - converted[1];
+			cVg_STARBOARD = 0 - (c_c2 + c_center + c_c5) - converted[2];
+			cVg_FASTER = .1 - (c_center + c_c0 + c_cFASTER) - converted[3];
+			
+			double[] data = {cVg_WAIT, cVg_PORT, cVg_STARBOARD, cVg_FASTER};
+			double maxScore = -2000;
+			for(double k : data){
+				if(k>maxScore){
+					maxScore = k;
+				}
+			}
+			
+			if(maxScore == cVg_WAIT){return "WAIT move";}
+			else if(maxScore == cVg_PORT){return "PORT move";}
+			else if(maxScore == cVg_STARBOARD){return "STARBOARD move";}
+			else{
+				return "FASTER move";
+			}
+		}
+		else if(speed == 1){
+			double cVg_WAIT = 0; //c3, center, c0
+			double cVg_PORT = 0; //c4, center, c1
+			double cVg_STARBOARD = 0; //c2, center, c5
+			double cVg_FASTER = 0; //center, c0, cFaster
+			double cVg_SLOWER = 0; //c3, center, c0
+			
+			int c_c0 = 0;
+			if(mineThere(c0, mines)){c_c0+=2;}
+			if(ballThereNextTurn(c0, balls)){c_c0++;}
+			if(!inRange(c0)){c_c0 += 1; } //can't do this if not in range
+			
+			int c_c1 = 0;
+			if(mineThere(c1, mines)){c_c1++;}
+			if(ballThereNextTurn(c1, balls)){c_c1++;}
+			if(!inRange(c1)){c_c1 += 1; } //can't do this if not in range
+			
+			int c_c2 = 0;
+			if(mineThere(c2, mines)){c_c2+=2;}
+			if(ballThereNextTurn(c2, balls)){c_c2++;}
+			if(!inRange(c2)){c_c2 += 1; } //can't do this if not in range
+			
+			int c_c3 = 0;
+			if(mineThere(c3, mines)){c_c3+=2;}
+			if(ballThereNextTurn(c3, balls)){c_c3++;}
+			if(!inRange(c3)){c_c3 += 1; } //can't do this if not in range
+			
+			int c_c4 = 0;
+			if(mineThere(c4, mines)){c_c4+=2;}
+			if(ballThereNextTurn(c4, balls)){c_c4++;}
+			if(!inRange(c4)){c_c4 += 1; } //can't do this if not in range
+			
+			int c_c5 = 0;
+			if(mineThere(c5, mines)){c_c5+=2;}
+			if(ballThereNextTurn(c5, balls)){c_c5++;}
+			if(!inRange(c5)){c_c5 += 1; } //can't do this if not in range
+			
+			int c_cFASTER = 0;
+			if(mineThere(cFASTER, mines)){c_cFASTER+=2;}
+			if(ballThereNextTurn(cFASTER, balls)){c_cFASTER++;}
+			if(!inRange(cFASTER)){c_cFASTER += 1; } //can't do this if not in range
+			
+			int c_center = 0;
+			if(mineThere(center, mines)){c_center+=2;}
+			if(ballThereNextTurn(center, balls)){c_center++;}
+			if(!inRange(center)){c_center += 1; } //can't do this if not in range
+			
+			
+			int distanceWAIT = HexDistance.distance(c0, closest.getCoord());
+			int distancePORT = HexDistance.distance(c1, closest.getCoord());
+			int distanceSTARBOARD = HexDistance.distance(c5, closest.getCoord());
+			int distanceFASTER = HexDistance.distance(cFASTER, closest.getCoord());
+			int distanceSLOWER = HexDistance.distance(c0, closest.getCoord());
+			
+			int[] s = new int[5];
+			s[0]=distanceWAIT;
+			s[1]=distancePORT;
+			s[2]=distanceSTARBOARD;
+			s[3]=distanceFASTER;
+			s[4]=distanceSLOWER;
+			
+			double[] converted = convertDistances(s);
+			
+			
+			//desirability calculations for all moves
+			cVg_WAIT = -1 - (c_c3 + c_center + c_c0) - converted[0];
+			cVg_PORT = 0 - (c_c4 + c_center + c_c1) - converted[1];
+			cVg_STARBOARD = 0 - (c_c2 + c_center + c_c5) - converted[2];
+			cVg_FASTER = .1 - (c_center + c_c0 + c_cFASTER) - converted[3];
+			cVg_SLOWER = 0 - (c_c3 + c_center + c_c0) - converted[4];
+			
+			double[] data = {cVg_WAIT, cVg_PORT, cVg_STARBOARD, cVg_FASTER, cVg_SLOWER};
+			double maxScore = -2000;
+			for(double k : data){
+				if(k>maxScore){
+					maxScore = k;
+				}
+			}
+			
+			if(maxScore == cVg_WAIT){return "WAIT move";}
+			else if(maxScore == cVg_PORT){return "PORT move";}
+			else if(maxScore == cVg_STARBOARD){return "STARBOARD move";}
+			else if(maxScore == cVg_SLOWER){return "SLOWER move";}
+			else{
+				return "FASTER move";
+			}
+		}
+        
+        return "MOVE " + closest.getX() + " " + closest.getY();
     }
         
     
@@ -737,6 +1090,7 @@ class Ship {
     }
     
     public static Coordinate cMBR(Coordinate c, int rot){
+        if(c.getX()<0 || c.getY()<0){return c; }
         if(rot==0){
             return new Coordinate(c.getX()+1, c.getY());
         }
